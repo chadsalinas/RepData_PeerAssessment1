@@ -1,20 +1,91 @@
 # Reproducible Research: Peer Assessment 1
 
 
+
 ## Loading and preprocessing the data
 
+```r
+MyData <- read.csv("activity.csv", header=TRUE, sep=",")
+MyData[MyData == 0] <- NA
+```
 
+## What is total number of steps taken per day?
 
-## What is mean total number of steps taken per day?
+```r
+MyData$date <- as.Date(MyData$date,"%Y-%m-%d")
+sumData <- aggregate(steps ~ date, data = MyData, sum)  # Calculate step totals
 
+# Graph total steps by day
+ggplot(sumData, aes(date, steps)) +
+        ggtitle("Total Steps by Day") + 
+        labs(x="Day", y="Total Steps") +
+        stat_summary(fun.y = sum, geom = "bar")
+```
 
+![](PA1_template_files/figure-html/totalsteps-1.png)<!-- -->
+
+## What is mean number of steps taken per day?
+
+```r
+# Graph mean steps by day
+meanData <- aggregate(steps ~ date, data = MyData, mean, na.rm=TRUE)  # Calculate step mean
+ggplot(meanData, aes(date, steps)) +
+        ggtitle("Mean Steps by Day") + 
+        labs(x="Day", y="Mean Steps") +
+        stat_summary(fun.y = mean, geom = "bar")
+```
+
+![](PA1_template_files/figure-html/meansteps-1.png)<!-- -->
+
+## What is median number of steps taken per day?
+
+```r
+# Graph median steps by day
+medianData <- aggregate(steps ~ date, data = MyData, median, na.rm=TRUE)  # Calculate step mean
+ggplot(medianData, aes(date, steps)) +
+        ggtitle("Median Steps by Day") + 
+        labs(x="Day", y="Median Steps") +
+        stat_summary(fun.y = median, geom = "bar")
+```
+
+![](PA1_template_files/figure-html/mediansteps-1.png)<!-- -->
 
 ## What is the average daily activity pattern?
 
+```r
+MyData <- read.csv("activity.csv", header=TRUE, sep=",")
+ggplot(MyData, aes(interval, steps)) + geom_line(color = "blue") +
+        ggtitle("Steps by Interval") +
+        xlab("5-Min Intervals") +
+        ylab("Steps") + 
+        stat_summary(fun.y = "max", color = "red", size = 1, geom = "point")
+```
 
+```
+## Warning: Removed 2304 rows containing non-finite values (stat_summary).
+```
 
-## Imputing missing values
+```
+## Warning: Removed 2 rows containing missing values (geom_path).
+```
+
+![](PA1_template_files/figure-html/avgDailyActivity-1.png)<!-- -->
+
+```r
+sumInterval <- aggregate(steps ~ interval, data = MyData, sum)  # Calculate step totals by interval
+maxRow <- sumInterval[which.max(sumInterval[,2] ), ]
+maxRow[1,1]
+```
+
+```
+## [1] 835
+```
+
+## Inputing missing values
 
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
+
+
+
