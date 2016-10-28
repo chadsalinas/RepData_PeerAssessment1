@@ -1,4 +1,6 @@
 # Reproducible Research: Peer Assessment 1
+Chad Salinas  
+October 25, 2016  
 
 
 
@@ -148,5 +150,24 @@ ggplot(medianData, aes(date, steps.x)) +
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
+```r
+library(lattice)
+imputedMeanData$date <- as.Date(imputedMeanData$date)
+imputedMeanData$date <- strptime(paste(imputedMeanData$date), format="%Y-%m-%d")
+weekdays <- c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday")
+imputedMeanData$weekday <- paste(weekdays(imputedMeanData$date))
 
+# Turn Mon-Fri into "Weekday"" and Sat. Sun. into "Weekend""
+imputedMeanData$weekday = as.factor(
+        ifelse(is.element(weekdays(as.Date(imputedMeanData$date)), weekdays), "Weekday", "Weekend"))
+agInterval <- aggregate(steps.x ~ interval + weekday, imputedMeanData, mean)
 
+xyplot(agInterval$steps.x ~ agInterval$interval | agInterval$weekday, 
+       main="Comparison of Weekend vs. Weekday Step Activity per Day by Interval", 
+       xlab="Interval", 
+       ylab="Number of steps", 
+       layout=c(1,2), 
+       type="l")
+```
+
+![](PA1_template_files/figure-html/weekdayWeekend-1.png)<!-- -->
