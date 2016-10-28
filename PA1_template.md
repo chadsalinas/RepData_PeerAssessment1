@@ -41,7 +41,7 @@ ggplot(meanData, aes(date, steps)) +
 
 ```r
 # Graph median steps by day
-medianData <- aggregate(steps ~ date, data = MyData, median, na.rm=TRUE)  # Calculate step mean
+medianData <- aggregate(steps ~ date, data = MyData, median, na.rm=TRUE)  # Calculate step median
 ggplot(medianData, aes(date, steps)) +
         ggtitle("Median Steps by Day") + 
         labs(x="Day", y="Median Steps") +
@@ -81,8 +81,69 @@ maxRow[1,1]
 ## [1] 835
 ```
 
-## Inputing missing values
+## Imputing missing values
+### Calculate and report the total number of missing values in the dataset 
 
+```r
+sum(is.na(MyData))
+```
+
+```
+## [1] 2304
+```
+
+### Fill missing values into new dataset with the mean for that day
+
+```r
+fillData <- MyData
+library(plyr)
+lookup <- aggregate(steps ~ date, data = MyData, mean, na.rm=TRUE)
+imputedMeanData <- merge(fillData, lookup, by = "date")
+imputedMeanData$steps.x[imputedMeanData$steps.x == 0] <- (imputedMeanData$steps.y[imputedMeanData$steps.x == 0])
+```
+
+## What is total number of steps taken per day with No Missing Values?
+
+```r
+imputedMeanData$date <- as.Date(imputedMeanData$date,"%Y-%m-%d")
+sumData <- aggregate(steps.x ~ date, data = imputedMeanData, sum)  # Calculate step totals
+
+# Graph total steps by day
+ggplot(sumData, aes(date, steps.x)) +
+        ggtitle("Total Steps by Day") + 
+        labs(x="Day", y="Total Steps") +
+        stat_summary(fun.y = sum, geom = "bar")
+```
+
+![](PA1_template_files/figure-html/totalstepsNoMissingValues-1.png)<!-- -->
+
+## What is mean number of steps taken per day with No Missing Values?
+
+```r
+# Graph mean steps by day
+meanData <- aggregate(steps.x ~ date, data = imputedMeanData, mean, na.rm=TRUE)  # Calculate step mean
+ggplot(meanData, aes(date, steps.x)) +
+        ggtitle("Mean Steps by Day") + 
+        labs(x="Day", y="Mean Steps") +
+        stat_summary(fun.y = mean, geom = "bar")
+```
+
+![](PA1_template_files/figure-html/meanstepsNoMissingValues-1.png)<!-- -->
+
+## What is median number of steps taken per day with No Missing Values?
+
+```r
+# Graph median steps by day
+medianData <- aggregate(steps.x ~ date, data = imputedMeanData, median, na.rm=TRUE)  # Calculate step median
+ggplot(medianData, aes(date, steps.x)) +
+        ggtitle("Median Steps by Day") + 
+        labs(x="Day", y="Median Steps") +
+        stat_summary(fun.y = median, geom = "bar")
+```
+
+![](PA1_template_files/figure-html/medianstepsNoMissingValues-1.png)<!-- -->
+
+##### These values differ from the estimates from the first part by increasing total number of steps, decreasing mean number of steps, and decreasing median # of steps. 
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
